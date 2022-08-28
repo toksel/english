@@ -2,8 +2,7 @@
 
 <PageTitle>Phrases</PageTitle>
 
-@inject IDataAccess _data
-@inject UpdateContainer _container
+@inject IDataManager _dataManager
 
 @if (phrases == null)
 {
@@ -81,7 +80,7 @@ else
     {
         if (phrases is null || phrases.Count < 1)
         {
-            phrases = (await _data.GetEntities(10)).ToList();
+            phrases = (await _dataManager.GetPhrases(10)).ToList();
         }
         var phrase = phrases.First();
         phrases.Remove(phrase);
@@ -91,7 +90,7 @@ else
     private async Task IncrementRate()
     {
         currentPhrase.Rank++;
-        _container.Add(currentPhrase);
+        await _dataManager.UpdatePhrase(currentPhrase);
         currentPhrase = await GetNext();
         HideBlocks();
     }
@@ -99,7 +98,7 @@ else
     private async Task DecrementRate()
     {
         currentPhrase.Rank--;
-        _container.Add(currentPhrase);
+        await _dataManager.UpdatePhrase(currentPhrase);
         currentPhrase = await GetNext();
         HideBlocks();
     }
@@ -120,9 +119,9 @@ else
         showEditBlock = false;
     }
 
-    private void SaveChanges()
+    private async Task SaveChanges()
     {
-        _container.Add(currentPhrase);
+        await _dataManager.UpdatePhrase(currentPhrase);
         HideBlocks();
     }
 }

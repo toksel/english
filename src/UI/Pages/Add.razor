@@ -1,5 +1,5 @@
 ﻿@page "/add"
-@inject IDataAccess _data
+@inject IDataManager _dataManager
 
 <PageTitle>Add phrases</PageTitle>
 
@@ -17,7 +17,7 @@
     {
         if (!string.IsNullOrEmpty(phrase.Text))
         {
-            await _data.InsertEntity(phrase);
+            await _dataManager.AddPhrase(phrase);
         }
         phrase = new();
     }

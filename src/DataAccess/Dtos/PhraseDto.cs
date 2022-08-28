@@ -1,8 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+namespace Data;
 
-namespace English;
-
-public class Phrase
+public class PhraseDto
 {
     public int Id { get; set; }
     public int Rank { get; set; } = 0;
