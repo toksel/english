@@ -1,0 +1,24 @@
+﻿@page "/add"
+@inject IDataAccess _data
+
+<PageTitle>Add phrases</PageTitle>
+
+<div class="input-group">
+  <button class="btn btn-outline-secondary" @onclick="Save" type="button" id="button-addon1">Save</button>
+  <input type="text" aria-label="Phraze" class="form-control" @bind-value="phrase.Text">
+  <input type="text" aria-label="Reference url" class="form-control" @bind-value="phrase.Reference">
+</div>
+
+@code {
+
+    private Phrase phrase = new();
+
+    private async Task Save()
+    {
+        if (!string.IsNullOrEmpty(phrase.Text))
+        {
+            await _data.InsertEntity(phrase);
+        }
+        phrase = new();
+    }
+}

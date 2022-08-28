@@ -1,0 +1,128 @@
+﻿@page "/phrases"
+
+<PageTitle>Phrases</PageTitle>
+
+@inject IDataAccess _data
+@inject UpdateContainer _container
+
+@if (phrases == null)
+{
+    <div class="text-center">
+        <div class="spinner-grow" style="width: 5rem; height: 5rem;" role="status">
+            <span class="sr-only" />
+        </div>
+    </div>
+}
+else
+{
+    <form class="row g-3">
+        <div class="col-md-6">
+            <input type="text" class="form-control" id="inputText" @bind-value="currentPhrase.Text">
+        </div>
+        <div class="col-md-1">
+            <button class="btn btn-outline-secondary" @onclick="Show" type="button" id="button-addon1">Show</button>
+        </div>
+        <div class="col-md-1">
+            <button class="btn btn-outline-success" @onclick="IncrementRate" type="button" id="button-addon1">Ok</button>
+        </div>
+        <div class="col-md-1">
+            <button class="btn btn-outline-danger" @onclick="DecrementRate" type="button" id="button-addon1">No</button>
+        </div>
+        <div class="col-md-1">
+            <button class="btn btn-outline-secondary" @onclick="ShowEdit" type="button" id="button-addon1">Edit</button>
+        </div>
+    </form>
+
+    if (showReference)
+    {
+        <div class="input-group">
+            <a href="@currentPhrase.Reference">Reference</a>
+        </div>
+    }
+
+    if (showEditBlock)
+    {
+        <form class="row g-3">
+            <div class="col-md-1">
+                <label for="inputId" class="form-label">Id</label>
+                <input type="text" class="form-control" id="inputId" @bind-value="currentPhrase.Id" disabled="true">
+            </div>
+            <div class="col-md-1">
+                <label for="inputRank" class="form-label">Rank</label>
+                <input type="text" class="form-control" id="inputRank" @bind-value="currentPhrase.Rank">
+            </div>
+            <div class="col-md-4">
+                <label for="inputText" class="form-label">Text</label>
+                <input type="text" class="form-control" id="inputText" @bind-value="currentPhrase.Text">
+            </div>
+            <div class="col-md-6">
+                <label for="inputReference" class="form-label">Reference</label>
+                <input type="text" class="form-control" id="inputReference" @bind-value="currentPhrase.Reference">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-secondary" @onclick="SaveChanges" type="button" id="button-addon1">Save</button>
+            </div>
+        </form>
+    }
+}
+
+@code {
+    private List<Phrase> phrases;
+    private Phrase currentPhrase;
+    private bool showReference = false;
+    private bool showEditBlock = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentPhrase = await GetNext();
+    }
+
+    private async Task<Phrase> GetNext()
+    {
+        if (phrases is null || phrases.Count < 1)
+        {
+            phrases = (await _data.GetEntities(10)).ToList();
+        }
+        var phrase = phrases.First();
+        phrases.Remove(phrase);
+        return phrase;
+    }
+
+    private async Task IncrementRate()
+    {
+        currentPhrase.Rank++;
+        _container.Add(currentPhrase);
+        currentPhrase = await GetNext();
+        HideBlocks();
+    }
+
+    private async Task DecrementRate()
+    {
+        currentPhrase.Rank--;
+        _container.Add(currentPhrase);
+        currentPhrase = await GetNext();
+        HideBlocks();
+    }
+
+    private void Show()
+    {
+        showReference = !showReference;
+    }
+
+    private void ShowEdit()
+    {
+        showEditBlock = !showEditBlock;
+    }
+
+    private void HideBlocks()
+    {
+        showReference = false;
+        showEditBlock = false;
+    }
+
+    private void SaveChanges()
+    {
+        _container.Add(currentPhrase);
+        HideBlocks();
+    }
+}
